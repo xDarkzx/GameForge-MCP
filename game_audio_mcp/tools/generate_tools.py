@@ -33,71 +33,38 @@ def register(mcp: FastMCP):
         song_title: str | None = None,
     ) -> dict:
         """Generate one instrumental/game-BGM track via Stable Audio 3,
-        run entirely locally on this machine's own GPU. Returns the
-        finished result directly, {"audio_path": str, "diagnostics":
-        {"generation_seconds", "duration_seconds"}} - NOT a job_id to
-        poll. This is fast (diffusion-based, confirmed well under a
-        second of actual compute once the checkpoint is cached) - unlike
-        SongForge-MCP/heart-mcp's job/poll pattern, there's nothing to
-        wait on.
+        entirely locally. Returns the finished result directly -
+        {"audio_path", "diagnostics": {"generation_seconds",
+        "duration_seconds"}} - not a job_id; this is fast, nothing to
+        poll for.
 
-        Describe the WHOLE arrangement in ONE prompt - do not call this
-        once per instrument and mix the results yourself. Real, confirmed
-        finding (2026-08-22): independently-generated instrument layers
-        do not share tempo/key/phrase structure and do not musically mesh
-        when mixed afterward. One rich prompt describing every element
-        together (e.g. "dark swamp drone, mournful viola da gamba
-        melody, tribal drums, buzzing insects, instrumental, cohesive
-        arrangement") produces a single coherent result and sounds much
-        better than combining separate calls.
+        Describe the WHOLE arrangement in ONE prompt (genre, all
+        instruments, mood, atmosphere together) - do not call this once
+        per instrument and mix results yourself; independent generations
+        don't share tempo/key and won't mesh. Name specific
+        instruments/techniques for real control, never a real artist.
 
-        This tool cannot produce independently toggleable layers sharing
-        one timeline (true "vertical layering") - no currently
-        locally-runnable model does (checked directly: the one research
-        system built for this, Stemphonic, has no public code/weights).
-        For adaptive game music, prefer generating a few complete
-        versions at different intensity levels and crossfading between
-        them in-engine, rather than asking for separate mixable stems.
+        Cannot produce independently toggleable stems sharing one
+        timeline ("vertical layering") - no locally-runnable model does.
+        For adaptive intensity, generate a few complete versions and
+        crossfade between them in-engine instead.
 
         Args:
-            prompt: Full description of the desired instrumental piece -
-                genre, instruments, mood, atmosphere, all together. Name
-                specific instruments/techniques for real control (e.g.
-                "sustained bowed strings, no plucking" avoided a generic
-                "Arabian market" cliche in this project's own testing).
-                Never name a real artist - describe their sound instead.
-            duration: Seconds, 1-380 (Medium's own documented ceiling).
-            steps: Diffusion steps, default 8 (Stable Audio's own
-                default - higher is slower but not necessarily better
-                for this model; only raise it if a result sounds
-                under-baked).
-            cfg_scale: Classifier-free guidance scale, default 1.0.
-                Stable Audio's own docs suggest ~7.0 for "-base" model
-                variants specifically, not the default tuned ones.
-            model: One of "medium" (default, best quality, ~6.5GB VRAM),
-                "small-music" (lighter, CPU-capable), "small-sfx" (sound
-                EFFECTS only - footsteps/impacts/UI, not music - do not
-                use this for background music), or their "-base" variants.
-            negative_prompt: Optional - describe what to avoid (e.g.
-                "vocals, singing" to reinforce instrumental-only).
-            seed: -1 for random (default). Fix a seed to reproduce or
-                nudge-iterate on a specific result.
-            init_audio_path: Optional local audio file for audio-to-audio
-                mode. Real caveat, confirmed this project: this
-                TRANSFORMS the reference audio rather than producing an
-                independent new stem - it does not solve "generate a
-                separate layer that matches an existing track." Useful
-                for genuine audio-to-audio variation, not for stem
-                extraction.
-            init_noise_level: 0.0-1.0, default 0.9. Only used when
-                init_audio_path is given - higher values diverge further
-                from the reference.
-            song_title: Optional name for this track, used in the output
-                filename instead of a bare id.
-
-        Raises GameAudioMCPError - STABLE_AUDIO_NOT_CONFIGURED,
-        FILE_NOT_FOUND (bad init_audio_path), SUBPROCESS_TIMEOUT,
-        SUBPROCESS_FAILED, SYNTHESIS_FAILED.
+            duration: Seconds, 1-380.
+            steps: Diffusion steps (default 8 - Stable Audio's own tuned
+                default; raise only if a result sounds under-baked).
+            cfg_scale: Guidance scale, default 1.0 (use ~7.0 only for a
+                "-base" model variant).
+            model: "medium" (default), "small-music", or "small-sfx"
+                (sound EFFECTS only - not music, don't use for BGM).
+                "-base" variants also exist.
+            negative_prompt: What to avoid, e.g. "vocals, singing".
+            seed: -1 = random (default).
+            init_audio_path: Audio-to-audio mode. Transforms the
+                reference rather than producing an independent stem -
+                not a fix for stem extraction.
+            init_noise_level: 0.0-1.0, default 0.9 (init_audio_path only).
+            song_title: Optional, used in the output filename.
         """
         prompt = validate_prompt(prompt)
         duration = validate_duration(duration)

@@ -134,9 +134,9 @@ def register(mcp: FastMCP):
         return {"job_id": job.id}
 
     @mcp.tool(structured_output=False)
-    async def check_job_status(job_id: str, wait_seconds: float = 25.0) -> list:
+    async def check_job_status(job_id: str, wait_seconds: float = 60.0) -> list:
         """Poll a job started by generate_game_audio. Waits up to
-        wait_seconds server-side if still running (capped at 25s) -
+        wait_seconds server-side if still running (capped at 60s) -
         call again immediately on "running", no extra delay needed.
 
         Say almost nothing while polling: one message when it finishes
@@ -152,7 +152,7 @@ def register(mcp: FastMCP):
         if job is None:
             raise GameAudioMCPError(ErrorCode.FILE_NOT_FOUND, f"no such job_id: {job_id}")
 
-        deadline = asyncio.get_event_loop().time() + max(0.0, min(wait_seconds, 25.0))
+        deadline = asyncio.get_event_loop().time() + max(0.0, min(wait_seconds, 60.0))
         while job.status == "running" and asyncio.get_event_loop().time() < deadline:
             await asyncio.sleep(0.5)
 

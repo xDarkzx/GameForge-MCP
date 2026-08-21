@@ -1,0 +1,74 @@
+[project]
+name = "game-audio-mcp"
+version = "0.1.0"
+description = "MCP server for local instrumental/game-BGM generation via Stable Audio 3 (https://github.com/Stability-AI/stable-audio-3)"
+license = "Apache-2.0"
+authors = [
+    { name = "Daniel Hodgetts" },
+]
+readme = "README.md"
+keywords = ["game-audio", "mcp", "model-context-protocol", "audio", "ai", "music-generation", "stable-audio", "game-dev"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Multimedia :: Sound/Audio :: Sound Synthesis",
+    "Topic :: Games/Entertainment",
+]
+requires-python = ">=3.10"
+dependencies = [
+    # Upper-bounded deliberately: mcp 2.0.0 is a real, confirmed breaking
+    # release (removed/restructured mcp.server.fastmcp, which this whole
+    # project imports). Same pin as SongForge-MCP/heart-mcp, same reason.
+    "mcp[cli]>=1.0.0,<2.0.0",
+    # Lightweight, CPU-only - this server's own venv never gets torch/etc:
+    # those live in stable-audio-3's own separate venv, driven via
+    # subprocess (see game_audio_mcp/audio_client.py).
+    "soundfile>=0.13.1",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "pytest-asyncio>=0.21",
+    "ruff==0.15.10",
+]
+
+[project.urls]
+Homepage = "https://github.com/xDarkzx/GameAudioMCP"
+Repository = "https://github.com/xDarkzx/GameAudioMCP"
+Issues = "https://github.com/xDarkzx/GameAudioMCP/issues"
+Changelog = "https://github.com/xDarkzx/GameAudioMCP/blob/main/CHANGELOG.md"
+
+[project.gui-scripts]
+# gui-scripts, not scripts: same reasoning as SongForge-MCP/heart-mcp's
+# own entry points - a background MCP server launched over stdio should
+# never pop a visible console window.
+game-audio-mcp = "game_audio_mcp.main:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.ruff.lint]
+# Real bugs (F, pyflakes) and real security patterns (S, bandit port) -
+# deliberately excludes E/W (pycodestyle style/formatting). Same
+# deliberate choice as SongForge-MCP/reaper-mcp.
+select = ["F", "S"]
+
+[tool.ruff.lint.per-file-ignores]
+# assert is how pytest tests are written - not a stripped-under-`-O`
+# production risk, since tests never ship or run with -O.
+"tests/*" = ["S101"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["game_audio_mcp", "game_audio_mcp_shared"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]

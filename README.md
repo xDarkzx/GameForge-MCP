@@ -26,7 +26,7 @@ GameAudioMCP connects any MCP-compatible AI assistant to [Stable Audio 3](https:
 
 **No cloud. Nothing leaves your machine.** Generation runs through a local subprocess call to your own stable-audio-3 checkout — your prompts and audio stay on your computer.
 
-**Fast by design.** Stable Audio 3 is diffusion-based, not autoregressive — generation is confirmed sub-second to a few seconds once the checkpoint is cached, dramatically faster than full-song vocal models. There's no job/poll pattern here because there's nothing worth polling for.
+**Fast by design.** Stable Audio 3 is diffusion-based, not autoregressive — a short clip generates in seconds once the checkpoint is cached, dramatically faster than full-song vocal models. Generation time does scale with requested duration though (confirmed: a 180s clip took ~4 minutes), so `generate_game_audio` still returns a job to poll rather than assuming every call is instant.
 
 ## Why this exists
 
@@ -65,7 +65,8 @@ This project sits alongside two other local music-generation MCP servers (SongFo
 
 ## Tools
 
-- `generate_game_audio` — one prompt → one instrumental/game-audio track, returns immediately (no job/poll)
+- `generate_game_audio` — one prompt → a job_id
+- `check_job_status` — poll a job started by `generate_game_audio`
 
 See the tool's own docstring (surfaced to any connected AI client) for full parameter docs.
 

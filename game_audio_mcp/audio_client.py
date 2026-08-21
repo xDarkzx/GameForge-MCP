@@ -1,22 +1,36 @@
 """Drives Stable Audio 3 generation locally via its own CLI
-(stable-audio.exe in stable-audio-3's venv), confirmed working end-to-end
-on this project's hardware (2026-08-22): sub-second generation once the
-Medium checkpoint is cached, vs. many minutes for this project's other
-two engines (ACE-Step, HeartMuLa) - this is diffusion-based, not
-autoregressive.
+(stable-audio.exe in stable-audio-3's venv). No persistent server -
+stable-audio-3 has no server mode, each call is its own short-lived
+subprocess.
 
-No job/poll pattern, unlike SongForge-MCP/heart-mcp: generation is fast
-enough that a tool call can just block on it directly. No persistent
-server either - stable-audio-3 has no server mode, each call is its own
-short-lived subprocess.
+Real, confirmed bug fixed 2026-08-22: this used to be a synchronous,
+no-job/poll design on the assumption that generation is always fast -
+true up to ~45s duration in this project's own testing, false beyond
+that: a 180s clip took ~4 minutes wall-clock, and Claude Desktop's own
+client-side tool-call timeout fired and reported "Tool execution
+failed" before that finished, even though the generation completed
+successfully seconds later (confirmed: the output file existed on disk
+right after). generate_tools.py now wraps this client in the same
+job/poll pattern SongForge-MCP/heart-mcp already use for exactly this
+reason - see their own history for the original incident this class of
+bug traces back to.
+
+_generate_lock serializes calls on this instance - a real risk
+surfaced by the same incident: Claude Desktop auto-retried the timed-
+out call while the original was still genuinely running server-side,
+which without a lock would let two subprocesses race for the same
+GPU/VRAM at once.
 """
 import os
 import subprocess
+import threading
 import time
 import uuid
 
 from game_audio_mcp_shared.constants import Paths, Timeouts, ensure_private_dir
 from game_audio_mcp_shared.error_codes import ErrorCode, GameAudioMCPError
+
+_generate_lock = threading.Lock()
 
 
 class StableAudioClient:
@@ -101,21 +115,22 @@ class StableAudioClient:
             args += ["--init-audio", init_audio_path, "--init-noise-level", str(init_noise_level)]
 
         start = time.monotonic()
-        try:
-            result = subprocess.run(  # noqa: S603 - args built entirely from this class's own resolved cli_exe path and caller-validated values, not passed through a shell
-                args,
-                cwd=self.stable_audio_home,
-                capture_output=True,
-                text=True,
-                timeout=Timeouts.GENERATION,
-            )
-        except subprocess.TimeoutExpired as e:
-            raise GameAudioMCPError(
-                ErrorCode.SUBPROCESS_TIMEOUT,
-                f"Stable Audio generation did not finish within {Timeouts.GENERATION:.0f}s.",
-            ) from e
-        except OSError as e:
-            raise GameAudioMCPError(ErrorCode.SUBPROCESS_FAILED, f"failed to launch stable-audio: {e}") from e
+        with _generate_lock:
+            try:
+                result = subprocess.run(  # noqa: S603 - args built entirely from this class's own resolved cli_exe path and caller-validated values, not passed through a shell
+                    args,
+                    cwd=self.stable_audio_home,
+                    capture_output=True,
+                    text=True,
+                    timeout=Timeouts.GENERATION,
+                )
+            except subprocess.TimeoutExpired as e:
+                raise GameAudioMCPError(
+                    ErrorCode.SUBPROCESS_TIMEOUT,
+                    f"Stable Audio generation did not finish within {Timeouts.GENERATION:.0f}s.",
+                ) from e
+            except OSError as e:
+                raise GameAudioMCPError(ErrorCode.SUBPROCESS_FAILED, f"failed to launch stable-audio: {e}") from e
 
         generation_seconds = time.monotonic() - start
         if result.returncode != 0:

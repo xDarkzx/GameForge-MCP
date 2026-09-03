@@ -1,12 +1,12 @@
-# Contributing to GameAudioMCP
+# Contributing to GameForge-MCP
 
 Thanks for your interest in contributing! Every PR — tool, bug fix, doc, or test — is welcome.
 
 ## Development setup
 
 ```bash
-git clone https://github.com/xDarkzx/GameAudioMCP.git
-cd GameAudioMCP
+git clone https://github.com/xDarkzx/GameForge-MCP.git
+cd GameForge-MCP
 pip install -e ".[dev]"
 ```
 

@@ -1,4 +1,4 @@
-<h1 align="center">GameAudioMCP</h1>
+<h1 align="center">GameForge-MCP</h1>
 
 <p align="center">
   <strong>Local instrumental &amp; game-BGM generation through the Model Context Protocol</strong>
@@ -9,7 +9,7 @@
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache%202.0-green.svg" alt="License" /></a>
   <a href="https://modelcontextprotocol.io"><img src="https://img.shields.io/badge/MCP-compatible-purple.svg" alt="MCP Compatible" /></a>
   <a href="CHANGELOG.md"><img src="https://img.shields.io/badge/version-0.1.0-orange.svg" alt="v0.1.0" /></a>
-  <a href="https://github.com/xDarkzx/GameAudioMCP/actions/workflows/ci.yml"><img src="https://github.com/xDarkzx/GameAudioMCP/actions/workflows/ci.yml/badge.svg" alt="CI" /></a>
+  <a href="https://github.com/xDarkzx/GameForge-MCP/actions/workflows/ci.yml"><img src="https://github.com/xDarkzx/GameForge-MCP/actions/workflows/ci.yml/badge.svg" alt="CI" /></a>
 </p>
 
 <p align="center">
@@ -22,7 +22,7 @@
 
 ---
 
-GameAudioMCP connects any MCP-compatible AI assistant to [Stable Audio 3](https://github.com/Stability-AI/stable-audio-3) (Medium checkpoint), generating instrumental music and game background audio entirely locally on your own GPU.
+GameForge-MCP connects any MCP-compatible AI assistant to [Stable Audio 3](https://github.com/Stability-AI/stable-audio-3) (Medium checkpoint), generating instrumental music and game background audio entirely locally on your own GPU.
 
 **No cloud. Nothing leaves your machine.** Generation runs through a local subprocess call to your own stable-audio-3 checkout — your prompts and audio stay on your computer.
 
@@ -54,7 +54,7 @@ This project sits alongside two other local music-generation MCP servers (SongFo
    {
      "mcpServers": {
        "game-audio": {
-         "command": "path/to/GameAudioMCP/.venv/Scripts/game-audio-mcp.exe",
+         "command": "path/to/GameForge-MCP/.venv/Scripts/game-audio-mcp.exe",
          "env": {
            "GAME_AUDIO_STABLE_AUDIO_HOME": "path/to/stable-audio-3"
          }

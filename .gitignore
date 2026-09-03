@@ -39,3 +39,8 @@ htmlcov/
 
 # Generated audio output (local renders, not source)
 game_audio_mcp/output/
+
+# Local project files, not part of the server source
+Backups/
+Media/
+*.rpp

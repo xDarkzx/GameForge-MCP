@@ -40,10 +40,10 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/xDarkzx/GameAudioMCP"
-Repository = "https://github.com/xDarkzx/GameAudioMCP"
-Issues = "https://github.com/xDarkzx/GameAudioMCP/issues"
-Changelog = "https://github.com/xDarkzx/GameAudioMCP/blob/main/CHANGELOG.md"
+Homepage = "https://github.com/xDarkzx/GameForge-MCP"
+Repository = "https://github.com/xDarkzx/GameForge-MCP"
+Issues = "https://github.com/xDarkzx/GameForge-MCP/issues"
+Changelog = "https://github.com/xDarkzx/GameForge-MCP/blob/main/CHANGELOG.md"
 
 [project.gui-scripts]
 # gui-scripts, not scripts: same reasoning as SongForge-MCP/heart-mcp's

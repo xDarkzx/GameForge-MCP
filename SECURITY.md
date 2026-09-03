@@ -4,7 +4,7 @@
 
 **Please do not open a public GitHub issue for a security vulnerability.** That publishes the details before a fix exists.
 
-Instead, use GitHub's private reporting: go to the [Security tab](https://github.com/xDarkzx/GameAudioMCP/security) → **Report a vulnerability**. This opens a private conversation only you and the maintainer can see, and lets you attach details/reproduction steps without exposing them publicly.
+Instead, use GitHub's private reporting: go to the [Security tab](https://github.com/xDarkzx/GameForge-MCP/security) → **Report a vulnerability**. This opens a private conversation only you and the maintainer can see, and lets you attach details/reproduction steps without exposing them publicly.
 
 ## What to Expect
 
@@ -12,7 +12,7 @@ This is a solo-maintained project, so response times aren't guaranteed on a fixe
 
 ## Scope
 
-GameAudioMCP runs locally and drives a local Stable Audio 3 checkout via subprocess on your own machine — there's no server, no cloud component, and no network exposure by design (the one network call is the one-time, user-authenticated Hugging Face checkpoint download). Relevant reports include things like:
+GameForge-MCP runs locally and drives a local Stable Audio 3 checkout via subprocess on your own machine — there's no server, no cloud component, and no network exposure by design (the one network call is the one-time, user-authenticated Hugging Face checkpoint download). Relevant reports include things like:
 
 - A way for a crafted prompt, filename, or MCP tool call to trigger unintended file access, code execution, or data exfiltration
 - Path traversal or injection through any tool parameter (e.g. `init_audio_path`)

@@ -10,6 +10,7 @@
   <a href="https://modelcontextprotocol.io"><img src="https://img.shields.io/badge/MCP-compatible-purple.svg" alt="MCP Compatible" /></a>
   <a href="CHANGELOG.md"><img src="https://img.shields.io/badge/version-0.1.0-orange.svg" alt="v0.1.0" /></a>
   <a href="https://github.com/xDarkzx/GameForge-MCP/actions/workflows/ci.yml"><img src="https://github.com/xDarkzx/GameForge-MCP/actions/workflows/ci.yml/badge.svg" alt="CI" /></a>
+  <a href="https://github.com/sponsors/xDarkzx"><img src="https://img.shields.io/badge/Sponsor-30363D?logo=githubsponsors&logoColor=EA4AAA" alt="Sponsor" /></a>
 </p>
 
 <p align="center">
@@ -19,6 +20,10 @@
   <a href="CHANGELOG.md">Changelog</a> &bull;
   <a href="CONTRIBUTING.md">Contributing</a>
 </p>
+
+---
+
+**If this is useful to you, a star helps other people find it** — that's the whole marketing budget for this project. Want to help keep it maintained? Click the **Sponsor** badge up top.
 
 ---
 
@@ -34,34 +39,53 @@ This project sits alongside two other local music-generation MCP servers (SongFo
 
 ## Quick start
 
-1. Clone and set up [stable-audio-3](https://github.com/Stability-AI/stable-audio-3) separately:
-   ```bash
-   git clone https://github.com/Stability-AI/stable-audio-3.git
-   cd stable-audio-3
-   uv venv
-   # Install CUDA torch matching your GPU before uv sync - the project's
-   # own CUDA index is Linux-gated, so a plain `uv sync` on Windows
-   # silently installs CPU-only torch. e.g.:
-   uv pip install torch==2.7.1+cu128 torchaudio==2.7.1+cu128 --index-url https://download.pytorch.org/whl/cu128
-   uv sync --extra ui --no-install-package torch --no-install-package torchaudio
-   # Then a matching Windows flash-attn wheel for your torch/CUDA/Python
-   # combo (see https://github.com/mjun0812/flash-attention-prebuild-wheels)
-   ```
-2. Accept `stabilityai/stable-audio-3-medium`'s gated license on [Hugging Face](https://huggingface.co/stabilityai/stable-audio-3-medium), then authenticate: `hf auth login`.
-3. Install this server: `pip install -e .`
-4. Point Claude Desktop (or any MCP client) at it:
-   ```json
-   {
-     "mcpServers": {
-       "game-audio": {
-         "command": "path/to/GameForge-MCP/.venv/Scripts/game-audio-mcp.exe",
-         "env": {
-           "GAME_AUDIO_STABLE_AUDIO_HOME": "path/to/stable-audio-3"
-         }
-       }
-     }
-   }
-   ```
+### 1. Get GameForge-MCP
+
+```bash
+git clone https://github.com/xDarkzx/GameForge-MCP.git
+cd GameForge-MCP
+```
+
+### 2. Run the installer
+
+The installer sets up GameForge-MCP's own venv, clones and configures [stable-audio-3](https://github.com/Stability-AI/stable-audio-3) (its `uv`-managed venv, the pinned CUDA torch build, and — with your say-so — a matching Flash Attention 2 wheel), and wires up Claude Desktop. It does **not** download the ~10GB model checkpoint itself — that's gated behind a Hugging Face license you have to accept yourself (step 3 below), and it downloads automatically on first real generation.
+
+**Windows:** either double-click `install.bat` in File Explorer, or keep going in the same terminal from the `git clone` step above:
+
+```
+.\install.bat
+```
+
+**Linux / macOS:**
+
+```bash
+bash install.sh
+```
+
+> Requires an NVIDIA GPU — Stable Audio 3 Medium needs Flash Attention 2, which has no CPU or macOS build. On a machine without one, the installer still sets up GameForge-MCP itself but skips the stable-audio-3 stage.
+
+Prefer to do it by hand, or already have your own stable-audio-3 checkout? See the [Installation Guide](docs/INSTALLATION.md) for the full manual steps.
+
+### 3. Accept the model license and authenticate
+
+Accept `stabilityai/stable-audio-3-medium`'s gated license on [Hugging Face](https://huggingface.co/stabilityai/stable-audio-3-medium), then authenticate: `hf auth login`. Both steps require your own Hugging Face account and can't be automated.
+
+### 4. Point Claude Desktop at it
+
+The installer does this for you if you say yes when it asks. To do it manually, or to configure another MCP client:
+
+```json
+{
+  "mcpServers": {
+    "game-audio": {
+      "command": "path/to/GameForge-MCP/.venv/Scripts/game-audio-mcp.exe",
+      "env": {
+        "GAME_AUDIO_STABLE_AUDIO_HOME": "path/to/stable-audio-3"
+      }
+    }
+  }
+}
+```
 
 ## Tools
 
@@ -75,6 +99,16 @@ See the tool's own docstring (surfaced to any connected AI client) for full para
 - **One prompt, one cohesive mix.** Describing the whole arrangement in one prompt ("dark swamp drone, mournful viola da gamba melody, tribal drums, buzzing insects, instrumental, cohesive arrangement") sounds far better than generating each instrument separately and mixing the results — independent generations don't share tempo/key/phrase structure and don't musically mesh.
 - **No true vertical layering available locally, checked directly.** The one research system built for synchronized multi-stem generation (Stemphonic, Adobe/MIT) has no public code or weights. For adaptive game music, prefer horizontal re-sequencing — a few complete versions at different intensity levels, crossfaded in-engine — over stem-based layering.
 - `init_audio` (audio-to-audio) is real and working, but transforms the reference track rather than producing an independent new stem — it doesn't solve the layering problem either.
+
+## Sponsor
+
+If GameForge-MCP has helped with your game audio, consider sponsoring:
+
+<p align="center">
+  <a href="https://github.com/sponsors/xDarkzx">
+    <img src="https://img.shields.io/badge/Sponsor-30363D?style=for-the-badge&logo=githubsponsors&logoColor=EA4AAA" alt="GitHub Sponsors" />
+  </a>
+</p>
 
 ## License
 

@@ -25,7 +25,7 @@ dependencies = [
     # Upper-bounded deliberately: mcp 2.0.0 is a real, confirmed breaking
     # release (removed/restructured mcp.server.fastmcp, which this whole
     # project imports). Same pin as SongForge-MCP/heart-mcp, same reason.
-    "mcp[cli]>=1.0.0,<2.0.0",
+    "mcp[cli]>=1.0.0,<3.0.0",
     # Lightweight, CPU-only - this server's own venv never gets torch/etc:
     # those live in stable-audio-3's own separate venv, driven via
     # subprocess (see game_audio_mcp/audio_client.py).
